@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Generate PWA Icons</title>
+<style>
+body { font-family: sans-serif; background: #0d0d12; color: #e4e4f0; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; gap: 20px; }
+h2 { font-size: 1.2rem; }
+p { font-size: 0.85rem; color: #666680; text-align: center; max-width: 400px; }
+canvas { border-radius: 22%; border: 1px solid #2a2a3a; }
+.btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+button { background: #4f8aff; color: #fff; border: none; border-radius: 8px; padding: 10px 20px; font-size: 0.9rem; cursor: pointer; }
+button.secondary { background: #1e1e2a; border: 1px solid #2a2a3a; color: #e4e4f0; }
+</style>
+</head>
+<body>
+<h2>PWA Icon Generator</h2>
+<p>Click the buttons below to download <strong>icon-192.png</strong> and <strong>icon-512.png</strong>, then place them in the <code>icons/</code> folder.</p>
+
+<canvas id="c" width="512" height="512"></canvas>
+
+<div class="btns">
+  <button onclick="download(192)">Download icon-192.png</button>
+  <button onclick="download(512)">Download icon-512.png</button>
+</div>
+
+<p style="margin-top:8px;font-size:0.75rem;">After downloading both files, delete this HTML file — it's not needed on the server.</p>
+
+<script>
+function drawIcon(size) {
+  const c = document.createElement('canvas');
+  c.width = size; c.height = size;
+  const ctx = c.getContext('2d');
+  const s = size;
+
+  // Background
+  const bg = ctx.createLinearGradient(0, 0, s, s);
+  bg.addColorStop(0, '#0d0d1a');
+  bg.addColorStop(0.6, '#111128');
+  bg.addColorStop(1, '#0d1a2e');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, s, s);
+
+  // Glow circle
+  const glow = ctx.createRadialGradient(s * 0.75, s * 0.25, 0, s * 0.75, s * 0.25, s * 0.5);
+  glow.addColorStop(0, 'rgba(79,138,255,0.18)');
+  glow.addColorStop(1, 'transparent');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, s, s);
+
+  // "J" letter
+  ctx.fillStyle = '#4f8aff';
+  ctx.font = `bold ${s * 0.62}px Georgia, serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('J', s * 0.5, s * 0.5);
+
+  // Accent dot
+  ctx.beginPath();
+  ctx.arc(s * 0.64, s * 0.68, s * 0.045, 0, Math.PI * 2);
+  ctx.fillStyle = '#3dd68c';
+  ctx.fill();
+
+  return c;
+}
+
+// Draw preview at 512
+const preview = drawIcon(512);
+const ctx = document.getElementById('c').getContext('2d');
+ctx.drawImage(preview, 0, 0);
+
+function download(size) {
+  const c = drawIcon(size);
+  const a = document.createElement('a');
+  a.download = `icon-${size}.png`;
+  a.href = c.toDataURL('image/png');
+  a.click();
+}
+</script>
+</body>
+</html>

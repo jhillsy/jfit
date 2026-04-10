@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="JFit">
+<meta name="theme-color" content="#0d0d12">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>JFit — Week 1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d0d12;
+  --surface: #16161f;
+  --surface2: #1e1e2a;
+  --border: #2a2a3a;
+  --accent: #4f8aff;
+  --accent-dim: rgba(79,138,255,0.12);
+  --green: #3dd68c;
+  --green-dim: rgba(61,214,140,0.1);
+  --red: #ff5f5f;
+  --yellow: #f5c542;
+  --text: #e4e4f0;
+  --muted: #666680;
+  --card-radius: 12px;
+}
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 80px;
+  font-size: 15px;
+}
+header {
+  background: linear-gradient(135deg, #0d0d1a 0%, #111128 60%, #0d1a2e 100%);
+  padding: 24px 18px 18px;
+  border-bottom: 1px solid var(--border);
+  position: relative; overflow: hidden;
+}
+header::after {
+  content: '';
+  position: absolute; top: -60px; right: -60px;
+  width: 220px; height: 220px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(79,138,255,0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+.h-row { display: flex; justify-content: space-between; align-items: flex-start; }
+.h-name { font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; letter-spacing: 3px; color: #fff; line-height: 1; }
+.h-sub { font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+.week-pill { background: var(--accent); color: #fff; font-size: 0.68rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 5px 12px; border-radius: 20px; margin-top: 4px; }
+.h-targets { display: flex; gap: 12px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.h-target { text-align: center; min-width: 50px; }
+.h-target-val { font-family: 'Bebas Neue', sans-serif; font-size: 1.15rem; letter-spacing: 1px; color: var(--accent); }
+.h-target-label { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 1px; }
+.nav { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; padding: 6px 8px; gap: 4px; }
+.nav-btn { flex: 1; padding: 8px 2px; border: none; background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.64rem; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; cursor: pointer; border-radius: 8px; transition: all 0.2s; line-height: 1.3; }
+.nav-btn.active { background: var(--accent); color: #fff; }
+.section { display: none; padding: 16px; }
+.section.active { display: block; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--card-radius); padding: 15px; margin-bottom: 12px; }
+.card-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+.section-note { font-size: 0.8rem; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
+.goals-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.goals-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 2px; }
+.goals-count { font-size: 0.78rem; color: var(--muted); }
+.pbar-wrap { background: var(--border); border-radius: 3px; height: 3px; margin-bottom: 16px; overflow: hidden; }
+.pbar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--green)); border-radius: 3px; transition: width 0.4s ease; }
+.goal-item { display: flex; align-items: flex-start; gap: 11px; padding: 12px 13px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
+.goal-item:active { transform: scale(0.98); }
+.goal-item.done { border-color: var(--green); background: var(--green-dim); }
+.goal-check { width: 21px; height: 21px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; font-size: 11px; transition: all 0.2s; color: transparent; }
+.goal-item.done .goal-check { background: var(--green); border-color: var(--green); color: #0d0d12; }
+.goal-text { flex: 1; font-size: 0.88rem; line-height: 1.45; }
+.goal-item.done .goal-text { color: var(--muted); text-decoration: line-through; }
+.goal-del { background: none; border: none; color: var(--muted); font-size: 1rem; cursor: pointer; padding: 0 2px; line-height: 1; opacity: 0.5; }
+.goal-del:hover { opacity: 1; color: var(--red); }
+.add-row { display: flex; gap: 8px; margin-top: 12px; }
+.add-input { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 13px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; outline: none; }
+.add-input:focus { border-color: var(--accent); }
+.add-input::placeholder { color: var(--muted); }
+.btn { background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 10px 16px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.btn:active { opacity: 0.8; }
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); font-size: 0.8rem; }
+.ci-block { background: var(--surface2); border: 1px solid var(--border); border-radius: 9px; padding: 13px; margin-bottom: 9px; }
+.ci-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent); margin-bottom: 5px; }
+.ci-link { color: var(--accent); font-size: 0.82rem; word-break: break-all; text-decoration: none; display: flex; align-items: center; gap: 6px; }
+.ci-link:hover { text-decoration: underline; }
+.steps-big { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; color: var(--green); letter-spacing: 2px; }
+.steps-row { display: flex; align-items: center; justify-content: space-between; }
+.w-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+.w-tab { flex: 1; padding: 9px 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; cursor: pointer; border-radius: 9px; line-height: 1.4; transition: all 0.2s; }
+.w-tab.active { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
+.w-section-label { font-family: 'Bebas Neue', sans-serif; font-size: 0.85rem; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin: 14px 0 7px; }
+.ex-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 13px; margin-bottom: 8px; }
+.ex-card.superset { border-color: rgba(79,138,255,0.3); background: rgba(79,138,255,0.04); }
+.ss-tag { display: inline-block; background: var(--accent); color: #fff; font-size: 0.6rem; font-weight: 700; letter-spacing: 1px; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; margin-bottom: 10px; }
+.ex-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+.ex-name { font-weight: 600; font-size: 0.88rem; flex: 1; padding-right: 8px; }
+.ex-letter { background: var(--accent); color: #fff; font-size: 0.65rem; font-weight: 700; min-width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+.chip { background: var(--surface); border: 1px solid var(--border); color: var(--text); font-size: 0.7rem; padding: 3px 9px; border-radius: 20px; }
+.ex-note { font-size: 0.76rem; color: var(--muted); margin-top: 7px; font-style: italic; }
+.ss-sep { height: 1px; background: var(--border); margin: 10px 0; }
+.w-done-bar { display: flex; align-items: center; justify-content: space-between; padding: 13px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 14px; }
+.w-done-bar.completed { border-color: var(--green); background: var(--green-dim); }
+.w-done-label { font-size: 0.85rem; font-weight: 600; }
+.w-done-bar.completed .w-done-label { color: var(--green); }
+.w-done-check { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: transparent; transition: all 0.2s; flex-shrink: 0; background: transparent; }
+.w-done-bar.completed .w-done-check { background: var(--green); border-color: var(--green); color: #0d0d12; }
+.goal-item.workout-goal { border-color: rgba(79,138,255,0.3); }
+.goal-item.workout-goal .goal-del { display: none; }
+.day-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+.day-tab { flex: 1; padding: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 600; cursor: pointer; border-radius: 9px; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.2s; }
+.day-tab.active { background: var(--surface2); border-color: var(--green); color: var(--green); }
+.macro-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 12px 13px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 12px; }
+.macro-cell { text-align: center; }
+.macro-val { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 1px; }
+.macro-val.kcal { color: #4f8aff; }
+.macro-val.prot { color: #3dd68c; }
+.macro-val.carb { color: #f5c542; }
+.macro-val.fat  { color: #ff6fb0; }
+.macro-lbl { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 1px; }
+.meal-block { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+.meal-head { display: flex; align-items: center; gap: 9px; padding: 11px 13px; border-bottom: 1px solid var(--border); }
+.meal-icon { font-size: 1.1rem; }
+.meal-name { font-weight: 600; font-size: 0.88rem; flex: 1; }
+.meal-kcal { font-size: 0.72rem; color: var(--muted); }
+.meal-body { padding: 9px 13px; }
+.food-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; font-size: 0.82rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.food-row:last-child { border-bottom: none; }
+.food-name { flex: 1; line-height: 1.4; }
+.food-qty { color: var(--muted); font-size: 0.75rem; white-space: nowrap; }
+.hist-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+.hist-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; cursor: pointer; }
+.hist-title { font-weight: 600; font-size: 0.88rem; }
+.hist-meta { font-size: 0.72rem; color: var(--muted); }
+.hist-body { padding: 0 14px 12px; border-top: 1px solid var(--border); display: none; }
+.hist-body.open { display: block; }
+.hist-goal { display: flex; align-items: flex-start; gap: 8px; padding: 7px 0; font-size: 0.84rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.hist-goal:last-child { border-bottom: none; }
+.hist-dot-done { color: var(--green); }
+.hist-dot-miss { color: var(--red); }
+.empty { text-align: center; padding: 30px 20px; color: var(--muted); font-size: 0.84rem; }
+.empty-icon { font-size: 2rem; margin-bottom: 8px; }
+.home-back { display: flex; align-items: center; gap: 6px; background: none; border: none; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; padding: 0; margin-bottom: 10px; -webkit-tap-highlight-color: transparent; }
+.home-back:active { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <button class="home-back" onclick="window.location.href='index.html'">‹ Home</button>
+  <div class="h-row">
+    <div>
+      <div class="h-name">Josh's Plan</div>
+      <div class="h-sub">Coaching Dashboard</div>
+    </div>
+    <div class="week-pill" id="weekPill">Week 1</div>
+  </div>
+  <div class="h-targets">
+    <div class="h-target"><div class="h-target-val">~1771</div><div class="h-target-label">kcal</div></div>
+    <div class="h-target"><div class="h-target-val">140g</div><div class="h-target-label">protein</div></div>
+    <div class="h-target"><div class="h-target-val">~163g</div><div class="h-target-label">carbs</div></div>
+    <div class="h-target"><div class="h-target-val">~57g</div><div class="h-target-label">fat</div></div>
+    <div class="h-target"><div class="h-target-val">10k+</div><div class="h-target-label">steps</div></div>
+  </div>
+</header>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showTab('goals',this)">✓ Goals</button>
+  <button class="nav-btn" onclick="showTab('checkin',this)">📋 Check-in</button>
+  <button class="nav-btn" onclick="showTab('workout',this)">🏋️ Workout</button>
+  <button class="nav-btn" onclick="showTab('food',this)">🥗 Food</button>
+  <button class="nav-btn" onclick="showTab('history',this)">📈 History</button>
+</nav>
+
+<!-- GOALS -->
+<div id="tab-goals" class="section active">
+  <div class="goals-head">
+    <div class="goals-title" id="goalWeekLabel">Week 1</div>
+    <div class="goals-count" id="goalCount">0 / 0 complete</div>
+  </div>
+  <div class="pbar-wrap"><div class="pbar-fill" id="pbarFill" style="width:0%"></div></div>
+  <div id="goalsList"></div>
+  <div class="add-row">
+    <input class="add-input" id="newGoalInput" placeholder="Add a goal for this week…" onkeydown="if(event.key==='Enter')addGoal()">
+    <button class="btn" onclick="addGoal()">Add</button>
+  </div>
+  <button class="btn btn-ghost" style="width:100%;margin-top:10px" onclick="archiveAndNewWeek()">🗓 Complete Week &amp; Start New</button>
+</div>
+
+<!-- CHECK-IN -->
+<div id="tab-checkin" class="section">
+  <p class="section-note">Latest coaching check-in. Update the video links each week as your coach sends them.</p>
+  <div class="card">
+    <div class="card-label">Coach Update — This Week</div>
+    <div class="ci-block">
+      <div class="ci-label">Check-In Response</div>
+      <a class="ci-link" href="https://www.tella.tv/video/josh-hills-check-in-response-9toe" target="_blank">▶ Watch Response Video</a>
+    </div>
+    <div class="ci-block">
+      <div class="ci-label">Food Review</div>
+      <a class="ci-link" href="https://www.tella.tv/video/josh-hills-food-analysis-1v3e" target="_blank">▶ Watch Food Analysis</a>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">Weekly Cardio Target</div>
+    <div class="steps-row">
+      <div>
+        <div class="steps-big">10,000+</div>
+        <div style="font-size:0.76rem;color:var(--muted);margin-top:2px">Daily step target — weekly average</div>
+      </div>
+      <div style="font-size:2rem">🚶</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">Last Submission</div>
+    <div class="ci-block">
+      <div class="ci-label">Food on a Plate Assessment</div>
+      <div style="font-size:0.88rem">✅ Sent via WhatsApp</div>
+    </div>
+  </div>
+</div>
+
+<!-- WORKOUT -->
+<div id="tab-workout" class="section">
+  <div class="w-tabs">
+    <button class="w-tab active" onclick="showWorkout('gym',this)">Full Body A<br><span style="font-size:0.6rem;font-weight:400;text-transform:none">Gym Workout</span></button>
+    <button class="w-tab" onclick="showWorkout('cardio',this)">Cardio<br><span style="font-size:0.6rem;font-weight:400;text-transform:none">Home Workout</span></button>
+  </div>
+
+  <div id="w-gym">
+    <div id="gym-done-bar" class="w-done-bar" onclick="toggleWorkoutDone('gym')">
+      <div class="w-done-label" id="gym-done-label">Mark Full Body A as done</div>
+      <div class="w-done-check" id="gym-done-check"></div>
+    </div>
+    <div class="w-section-label">Warm Up</div>
+    <div class="ex-card">
+      <div class="ex-header"><div class="ex-name">Walking On Treadmill</div><div class="ex-letter">A</div></div>
+      <div class="chips"><span class="chip">HR: Zone 2</span><span class="chip">Time: 5min</span></div>
+      <div class="ex-note">Incline treadmill walk.</div>
+    </div>
+    <div class="w-section-label">Workout</div>
+    <div class="ex-card">
+      <div class="ex-header"><div class="ex-name">Machine Shoulder Press</div><div class="ex-letter">A</div></div>
+      <div class="chips"><span class="chip">Sets: 2</span><span class="chip">Reps: 8–10</span><span class="chip">Rest: 2min</span></div>
+    </div>
+    <div class="ex-card">
+      <div class="ex-header"><div class="ex-name">Incline 45° Leg Press Machine</div><div class="ex-letter">B</div></div>
+      <div class="chips"><span class="chip">Sets: 2</span><span class="chip">Reps: 10–12</span><span class="chip">Rest: 2min</span><span class="chip">Tempo: 2111</span><span class="chip">RIR: 0–1</span></div>
+    </div>
+    <div class="ex-card">
+      <div class="ex-header"><div class="ex-name">Chest Press</div><div class="ex-letter">C</div></div>
+      <div class="chips"><span class="chip">Sets: 2</span><span class="chip">Reps: 10–12</span><span class="chip">Rest: 2min</span><span class="chip">Tempo: 2111</span><span class="chip">RIR: 0–1</span></div>
+    </div>
+    <div class="ex-card">
+      <div class="ex-header"><div class="ex-name">Wide Neutral Grip Cable Pulldown</div><div class="ex-letter">D</div></div>
+      <div class="chips"><span class="chip">Sets: 2</span><span class="chip">Reps: 10–12</span><span class="chip">Rest: 2min</span></div>
+    </div>
+    <div class="ex-card superset">
+      <div class="ss-tag">Superset E</div>
+      <div class="ex-header"><div class="ex-name">Machine Hammer Rows</div><div class="ex-letter">E1</div></div>
+      <div class="chips"><span class="chip">Sets: 2</span><span class="chip">Reps: 10–12</span></div>
+      <div class="ss-sep"></div>
+      <div class="ex-header"><div class="ex-name">Dumbbell Lateral Raises</div><div class="ex-letter">E2</div></div>
+      <div class="chips"><span class="chip">Sets: 2</span><span class="chip">Reps: 12–15</span><span class="chip">Rest: 2min</span></div>
+    </div>
+    <div class="ex-card">
+      <div class="ex-header"><div class="ex-name">Lying Leg Curl</div><div class="ex-letter">F</div></div>
+      <div class="chips"><span class="chip">Sets: 2</span><span class="chip">Reps: 8–10</span><span class="chip">Rest: 2min</span><span class="chip">RIR: 0–1</span></div>
+    </div>
+    <div class="ex-card superset">
+      <div class="ss-tag">Superset G</div>
+      <div class="ex-header"><div class="ex-name">Preacher Curl</div><div class="ex-letter">G1</div></div>
+      <div class="chips"><span class="chip">Sets: 2</span><span class="chip">Reps: 10–12</span><span class="chip">Tempo: 2111</span><span class="chip">RIR: 0–1</span></div>
+      <div class="ss-sep"></div>
+      <div class="ex-header"><div class="ex-name">Cable Triceps Pushdown</div><div class="ex-letter">G2</div></div>
+      <div class="chips"><span class="chip">Sets: 2</span><span class="chip">Reps: 10–12</span><span class="chip">Rest: 2min</span><span class="chip">Tempo: 2111</span><span class="chip">RIR: 0–1</span></div>
+    </div>
+  </div>
+
+  <div id="w-cardio" style="display:none">
+    <div id="cardio-done-bar" class="w-done-bar" onclick="toggleWorkoutDone('cardio')">
+      <div class="w-done-label" id="cardio-done-label">Mark Cardio Home as done</div>
+      <div class="w-done-check" id="cardio-done-check"></div>
+    </div>
+    <div class="w-section-label">Warm Up</div>
+    <div class="ex-card">
+      <div class="ex-header"><div class="ex-name">Skipping</div><div class="ex-letter">A</div></div>
+      <div class="chips"><span class="chip">HR: Zone 2</span><span class="chip">Time: 5min</span></div>
+      <div class="ex-note">5 min warm up.</div>
+    </div>
+    <div class="w-section-label">Workout</div>
+    <div class="ex-card superset">
+      <div class="ss-tag">Superset A</div>
+      <div class="ex-header"><div class="ex-name">Battling Ropes</div><div class="ex-letter">A1</div></div>
+      <div class="chips"><span class="chip">Time: 1min</span></div>
+      <div class="ex-note">Hard as you can for 1min.</div>
+      <div class="ss-sep"></div>
+      <div class="ex-header"><div class="ex-name">Box Jump Squats</div><div class="ex-letter">A2</div></div>
+      <div class="chips"><span class="chip">Sets: 3</span><span class="chip">Reps: 20</span><span class="chip">Rest: 3min</span></div>
+    </div>
+    <div class="ex-card superset">
+      <div class="ss-tag">Superset B</div>
+      <div class="ex-header"><div class="ex-name">Alternate Punching</div><div class="ex-letter">B1</div></div>
+      <div class="chips"><span class="chip">Time: 1min</span></div>
+      <div class="ex-note">Hard as you can — punching bag for 1min.</div>
+      <div class="ss-sep"></div>
+      <div class="ex-header"><div class="ex-name">Walking Lunge</div><div class="ex-letter">B2</div></div>
+      <div class="chips"><span class="chip">Sets: 3</span><span class="chip">Reps: 12p/side</span><span class="chip">Rest: 3min</span></div>
+      <div class="ex-note">Weighted walking lunges — use neck weight.</div>
+    </div>
+    <div class="ex-card superset">
+      <div class="ss-tag">Superset C</div>
+      <div class="ex-header"><div class="ex-name">Dice Roll</div><div class="ex-letter">C1</div></div>
+      <div class="chips"><span class="chip">Time: 1min</span></div>
+      <div class="ex-note">Use the dice roll for cardio. Complete output.</div>
+      <div class="ss-sep"></div>
+      <div class="ex-header"><div class="ex-name">Farmer Carry on Driveway</div><div class="ex-letter">C2</div></div>
+      <div class="chips"><span class="chip">Rest: 3min</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOD -->
+<div id="tab-food" class="section">
+  <p class="section-note">Your 3-day rotating nutrition plan (T2A). Target: ~1750 kcal / 140g+ protein.</p>
+  <div class="day-tabs">
+    <button class="day-tab active" onclick="showDay(1,this)">Day 1</button>
+    <button class="day-tab" onclick="showDay(2,this)">Day 2</button>
+    <button class="day-tab" onclick="showDay(3,this)">Day 3</button>
+  </div>
+
+  <div id="day-1">
+    <div class="macro-bar">
+      <div class="macro-cell"><div class="macro-val kcal">1771</div><div class="macro-lbl">kcal</div></div>
+      <div class="macro-cell"><div class="macro-val prot">140g</div><div class="macro-lbl">protein</div></div>
+      <div class="macro-cell"><div class="macro-val carb">163g</div><div class="macro-lbl">carbs</div></div>
+      <div class="macro-cell"><div class="macro-val fat">57g</div><div class="macro-lbl">fat</div></div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">🍎</div><div class="meal-name">Pre-Workout</div><div class="meal-kcal">92 kcal</div></div>
+      <div class="meal-body"><div class="food-row"><div class="food-name">Fresh Fruit — apple, banana, pear, orange, or 2x kiwi</div><div class="food-qty">150g</div></div></div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">💧</div><div class="meal-name">Intra Workout</div><div class="meal-kcal">6 kcal</div></div>
+      <div class="meal-body"><div class="food-row"><div class="food-name">Musashi Electrolytes (Watermelon)</div><div class="food-qty">515ml</div></div></div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">🥛</div><div class="meal-name">Post-Workout</div><div class="meal-kcal">113 kcal</div></div>
+      <div class="meal-body"><div class="food-row"><div class="food-name">Whey Protein Isolate (WPI)</div><div class="food-qty">30g</div></div></div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">🥣</div><div class="meal-name">Breakfast — Oats</div><div class="meal-kcal">370 kcal</div></div>
+      <div class="meal-body">
+        <div class="food-row"><div class="food-name">Plain Rolled Oats</div><div class="food-qty">50g</div></div>
+        <div class="food-row"><div class="food-name">Skim Milk</div><div class="food-qty">200g</div></div>
+        <div class="food-row"><div class="food-name">Frozen Berries</div><div class="food-qty">100g</div></div>
+        <div class="food-row"><div class="food-name">Chia Seeds</div><div class="food-qty">10g</div></div>
+      </div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">🥩</div><div class="meal-name">Lunch — Beef Stir Fry</div><div class="meal-kcal">390 kcal</div></div>
+      <div class="meal-body">
+        <div class="food-row"><div class="food-name">Brown Rice</div><div class="food-qty">40g</div></div>
+        <div class="food-row"><div class="food-name">Traditional Veg Stir Fry Mix (Woolworths)</div><div class="food-qty">100g</div></div>
+        <div class="food-row"><div class="food-name">Stir Fry Sauce (Kikkoman)</div><div class="food-qty">20g</div></div>
+        <div class="food-row"><div class="food-name">Beef Stir-Fry (Coles)</div><div class="food-qty">180g</div></div>
+      </div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">🍗</div><div class="meal-name">Dinner — Honey Soy Chicken Bowl</div><div class="meal-kcal">633 kcal</div></div>
+      <div class="meal-body">
+        <div class="food-row"><div class="food-name">Chicken Breast</div><div class="food-qty">120g</div></div>
+        <div class="food-row"><div class="food-name">Honey &amp; Soy Marinade (Ayamo)</div><div class="food-qty">30ml</div></div>
+        <div class="food-row"><div class="food-name">Sesame Seeds</div><div class="food-qty">10g</div></div>
+        <div class="food-row"><div class="food-name">Broccoli</div><div class="food-qty">150g</div></div>
+        <div class="food-row"><div class="food-name">Potato Wedges</div><div class="food-qty">80g</div></div>
+        <div class="food-row"><div class="food-name">Avocado</div><div class="food-qty">100g</div></div>
+      </div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">🍫</div><div class="meal-name">Dessert</div><div class="meal-kcal">167 kcal</div></div>
+      <div class="meal-body"><div class="food-row"><div class="food-name">Old Gold 70% Dark Chocolate (Cadbury)</div><div class="food-qty">30g</div></div></div>
+    </div>
+  </div>
+
+  <div id="day-2" style="display:none">
+    <div class="macro-bar">
+      <div class="macro-cell"><div class="macro-val kcal">1787</div><div class="macro-lbl">kcal</div></div>
+      <div class="macro-cell"><div class="macro-val prot">161g</div><div class="macro-lbl">protein</div></div>
+      <div class="macro-cell"><div class="macro-val carb">166g</div><div class="macro-lbl">carbs</div></div>
+      <div class="macro-cell"><div class="macro-val fat">42g</div><div class="macro-lbl">fat</div></div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">🍎</div><div class="meal-name">Pre-Workout</div><div class="meal-kcal">92 kcal</div></div>
+      <div class="meal-body"><div class="food-row"><div class="food-name">Fresh Fruit — apple, banana, pear, orange, or 2x kiwi</div><div class="food-qty">150g</div></div></div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">💧</div><div class="meal-name">Intra Workout</div><div class="meal-kcal">6 kcal</div></div>
+      <div class="meal-body"><div class="food-row"><div class="food-name">Musashi Electrolytes (Watermelon)</div><div class="food-qty">515ml</div></div></div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">☕</div><div class="meal-name">Coffee</div><div class="meal-kcal">162 kcal</div></div>
+      <div class="meal-body">
+        <div class="food-row"><div class="food-name">Espresso</div><div class="food-qty">100g</div></div>
+        <div class="food-row"><div class="food-name">Skim Milk</div><div class="food-qty">450g</div></div>
+      </div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">🫐</div><div class="meal-name">Breakfast — Yogurt Bowl</div><div class="meal-kcal">531 kcal</div></div>
+      <div class="meal-body">
+        <div class="food-row"><div class="food-name">Light Milk</div><div class="food-qty">120ml</div></div>
+        <div class="food-row"><div class="food-name">Chobani Plain Non-Fat Greek Yogurt</div><div class="food-qty">100g</div></div>
+        <div class="food-row"><div class="food-name">Mixed Berries</div><div class="food-qty">80g</div></div>
+        <div class="food-row"><div class="food-name">Chia Seeds</div><div class="food-qty">10g</div></div>
+        <div class="food-row"><div class="food-name">Cinnamon Ground</div><div class="food-qty">5g</div></div>
+        <div class="food-row"><div class="food-name">Whey Protein Isolate (WPI)</div><div class="food-qty">20g</div></div>
+        <div class="food-row"><div class="food-name">Almonds Raw</div><div class="food-qty">10g</div></div>
+        <div class="food-row"><div class="food-name">Weetbix (Sanitarium)</div><div class="food-qty">50g</div></div>
+      </div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">🥪</div><div class="meal-name">Lunch — Turkey Sandwich</div><div class="meal-kcal">393 kcal</div></div>
+      <div class="meal-body">
+        <div class="food-row"><div class="food-name">Wholegrain Bread</div><div class="food-qty">70g</div></div>
+        <div class="food-row"><div class="food-name">Turkey Breast (sliced/deli)</div><div class="food-qty">120g</div></div>
+        <div class="food-row"><div class="food-name">Lettuce</div><div class="food-qty">75g</div></div>
+        <div class="food-row"><div class="food-name">Tomatoes</div><div class="food-qty">50g</div></div>
+        <div class="food-row"><div class="food-name">Baby Spinach</div><div class="food-qty">30g</div></div>
+        <div class="food-row"><div class="food-name">Mustard</div><div class="food-qty">10g</div></div>
+        <div class="food-row"><div class="food-name">Cottage Cheese</div><div class="food-qty">50g</div></div>
+      </div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">🥗</div><div class="meal-name">Dinner — Chicken Salad</div><div class="meal-kcal">403 kcal</div></div>
+      <div class="meal-body">
+        <div class="food-row"><div class="food-name">Chicken Breast</div><div class="food-qty">120g</div></div>
+        <div class="food-row"><div class="food-name">Mixed Greens</div><div class="food-qty">2 cups</div></div>
+        <div class="food-row"><div class="food-name">Balsamic Vinegar</div><div class="food-qty">1 tbsp</div></div>
+        <div class="food-row"><div class="food-name">Avocado</div><div class="food-qty">50g</div></div>
+        <div class="food-row"><div class="food-name">Extra Virgin Olive Oil</div><div class="food-qty">5g</div></div>
+        <div class="food-row"><div class="food-name">Beetroot</div><div class="food-qty">30g</div></div>
+        <div class="food-row"><div class="food-name">Carrots</div><div class="food-qty">30g</div></div>
+        <div class="food-row"><div class="food-name">Cucumber</div><div class="food-qty">30g</div></div>
+        <div class="food-row"><div class="food-name">Cherry Tomatoes</div><div class="food-qty">40g</div></div>
+        <div class="food-row"><div class="food-name">Celery</div><div class="food-qty">20g</div></div>
+      </div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">🍦</div><div class="meal-name">Dessert</div><div class="meal-kcal">87 kcal</div></div>
+      <div class="meal-body"><div class="food-row"><div class="food-name">Strawberry &amp; Vanilla Bean Frozen Yoghurt (Twisted Healthy Treats)</div><div class="food-qty">70g</div></div></div>
+    </div>
+  </div>
+
+  <div id="day-3" style="display:none">
+    <div class="macro-bar">
+      <div class="macro-cell"><div class="macro-val kcal">1790</div><div class="macro-lbl">kcal</div></div>
+      <div class="macro-cell"><div class="macro-val prot">159g</div><div class="macro-lbl">protein</div></div>
+      <div class="macro-cell"><div class="macro-val carb">193g</div><div class="macro-lbl">carbs</div></div>
+      <div class="macro-cell"><div class="macro-val fat">36g</div><div class="macro-lbl">fat</div></div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">💧</div><div class="meal-name">Intra Workout</div><div class="meal-kcal">6 kcal</div></div>
+      <div class="meal-body"><div class="food-row"><div class="food-name">Musashi Electrolytes (Watermelon)</div><div class="food-qty">515ml</div></div></div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">🥛</div><div class="meal-name">Post-Workout</div><div class="meal-kcal">113 kcal</div></div>
+      <div class="meal-body"><div class="food-row"><div class="food-name">Whey Protein Isolate (WPI)</div><div class="food-qty">30g</div></div></div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">🫐</div><div class="meal-name">Breakfast — Yogurt Bowl</div><div class="meal-kcal">531 kcal</div></div>
+      <div class="meal-body">
+        <div class="food-row"><div class="food-name">Light Milk</div><div class="food-qty">120ml</div></div>
+        <div class="food-row"><div class="food-name">Chobani Plain Non-Fat Greek Yogurt</div><div class="food-qty">100g</div></div>
+        <div class="food-row"><div class="food-name">Mixed Berries</div><div class="food-qty">80g</div></div>
+        <div class="food-row"><div class="food-name">Chia Seeds</div><div class="food-qty">10g</div></div>
+        <div class="food-row"><div class="food-name">Cinnamon Ground</div><div class="food-qty">5g</div></div>
+        <div class="food-row"><div class="food-name">Whey Protein Isolate (WPI)</div><div class="food-qty">20g</div></div>
+        <div class="food-row"><div class="food-name">Almonds Raw</div><div class="food-qty">10g</div></div>
+        <div class="food-row"><div class="food-name">Weetbix (Sanitarium)</div><div class="food-qty">50g</div></div>
+      </div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">☕</div><div class="meal-name">Coffee</div><div class="meal-kcal">162 kcal</div></div>
+      <div class="meal-body">
+        <div class="food-row"><div class="food-name">Espresso</div><div class="food-qty">100g</div></div>
+        <div class="food-row"><div class="food-name">Skim Milk</div><div class="food-qty">450g</div></div>
+      </div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">🥙</div><div class="meal-name">Lunch — OG Chicken/Fish Bowl</div><div class="meal-kcal">339 kcal</div></div>
+      <div class="meal-body">
+        <div class="food-row"><div class="food-name">The O.G. Chicken / Fish Bowl</div><div class="food-qty">1 qty</div></div>
+        <div class="food-row"><div class="food-name">Avocado</div><div class="food-qty">30g</div></div>
+      </div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">🥖</div><div class="meal-name">Dinner — Subway</div><div class="meal-kcal">556 kcal</div></div>
+      <div class="meal-body"><div class="food-row"><div class="food-name">Subway Footlong Chicken Strips Sub</div><div class="food-qty">1 qty</div></div></div>
+    </div>
+    <div class="meal-block">
+      <div class="meal-head"><div class="meal-icon">🍫</div><div class="meal-name">Dessert</div><div class="meal-kcal">83 kcal</div></div>
+      <div class="meal-body"><div class="food-row"><div class="food-name">Old Gold 70% Dark Chocolate (Cadbury)</div><div class="food-qty">15g</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div id="tab-history" class="section">
+  <p class="section-note">Completed weeks are archived here when you hit "Complete Week &amp; Start New".</p>
+  <div id="historyList"></div>
+</div>
+
+<script>
+const DEFAULT_GOALS = [
+  { id: 1, text: 'Send availability for Friday (call)', done: false },
+  { id: 2, text: '10,000+ steps daily average for the week', done: false },
+  { id: 3, text: 'Send 2-day Food On A Plate Assessment (via WhatsApp)', done: false }
+];
+const WORKOUT_LABELS = { gym: 'Complete Full Body A (Gym)', cardio: 'Complete Cardio Home Workout' };
+
+let state = JSON.parse(localStorage.getItem('joshCoachPlan') || 'null') || {
+  currentWeek: 1,
+  goals: DEFAULT_GOALS.map(g => ({...g})),
+  history: [],
+  nextId: 4,
+  workouts: { gym: false, cardio: false }
+};
+if (!state.workouts) state.workouts = { gym: false, cardio: false };
+
+function save() { localStorage.setItem('joshCoachPlan', JSON.stringify(state)); }
+
+function showTab(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (name === 'history') renderHistory();
+}
+
+function showWorkout(type, btn) {
+  document.querySelectorAll('.w-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('w-gym').style.display = type === 'gym' ? 'block' : 'none';
+  document.getElementById('w-cardio').style.display = type === 'cardio' ? 'block' : 'none';
+}
+
+function showDay(n, btn) {
+  document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  [1,2,3].forEach(d => { document.getElementById('day-' + d).style.display = d === n ? 'block' : 'none'; });
+}
+
+// Toggle workout done from either workout tab or goals tab
+function toggleWorkoutDone(type) {
+  state.workouts[type] = !state.workouts[type];
+  save();
+  renderWorkoutDoneBars();
+  renderGoals();
+}
+
+function renderWorkoutDoneBars() {
+  ['gym','cardio'].forEach(type => {
+    const done = state.workouts[type];
+    const bar = document.getElementById(type + '-done-bar');
+    const label = document.getElementById(type + '-done-label');
+    const check = document.getElementById(type + '-done-check');
+    if (!bar) return;
+    if (done) { bar.classList.add('completed'); } else { bar.classList.remove('completed'); }
+    label.textContent = done
+      ? (type === 'gym' ? '✓ Full Body A completed this week!' : '✓ Cardio Home completed this week!')
+      : (type === 'gym' ? 'Mark Full Body A as done' : 'Mark Cardio Home as done');
+    check.textContent = done ? '✓' : '';
+  });
+}
+
+function getWorkoutGoals() {
+  return ['gym','cardio']
+    .filter(type => state.workouts[type])
+    .map(type => ({
+      id: 'wg-' + type,
+      text: WORKOUT_LABELS[type],
+      done: true,
+      workoutType: type
+    }));
+}
+
+function getAllGoals() {
+  return [...getWorkoutGoals(), ...state.goals];
+}
+
+function renderGoals() {
+  const allGoals = getAllGoals();
+  const done = allGoals.filter(g => g.done).length;
+  const total = allGoals.length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  document.getElementById('goalWeekLabel').textContent = 'Week ' + state.currentWeek;
+  document.getElementById('weekPill').textContent = 'Week ' + state.currentWeek;
+  document.getElementById('goalCount').textContent = done + ' / ' + total + ' complete';
+  document.getElementById('pbarFill').style.width = pct + '%';
+  const list = document.getElementById('goalsList');
+  list.innerHTML = allGoals.map(g => {
+    const isW = !!g.workoutType;
+    return `<div class="goal-item ${g.done ? 'done' : ''} ${isW ? 'workout-goal' : ''}" onclick="${isW ? `toggleWorkoutDone('${g.workoutType}')` : `toggleGoal('${g.id}')`}">
+      <div class="goal-check">${g.done ? '✓' : ''}</div>
+      <div class="goal-text">${isW ? '🏋️ ' : ''}${g.text}</div>
+      ${!isW ? `<button class="goal-del" onclick="event.stopPropagation();deleteGoal('${g.id}')">✕</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function toggleGoal(id) {
+  const g = state.goals.find(g => String(g.id) === String(id));
+  if (g) { g.done = !g.done; save(); renderGoals(); }
+}
+
+function deleteGoal(id) {
+  state.goals = state.goals.filter(g => String(g.id) !== String(id));
+  save(); renderGoals();
+}
+
+function addGoal() {
+  const input = document.getElementById('newGoalInput');
+  const text = input.value.trim();
+  if (!text) return;
+  state.goals.push({ id: state.nextId++, text, done: false });
+  input.value = '';
+  save(); renderGoals();
+}
+
+function archiveAndNewWeek() {
+  const allGoals = getAllGoals();
+  const done = allGoals.filter(g => g.done).length;
+  if (!confirm('Complete Week ' + state.currentWeek + '?\n\n' + done + ' of ' + allGoals.length + ' goals done.\n\nThis will archive the week and start fresh.')) return;
+  state.history.unshift({
+    week: state.currentWeek,
+    goals: allGoals.map(g => ({...g})),
+    date: new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })
+  });
+  state.currentWeek++;
+  state.goals = DEFAULT_GOALS.map(g => ({...g}));
+  state.workouts = { gym: false, cardio: false };
+  save(); renderGoals(); renderWorkoutDoneBars(); renderHistory();
+}
+
+function renderHistory() {
+  const container = document.getElementById('historyList');
+  if (!state.history.length) {
+    container.innerHTML = '<div class="empty"><div class="empty-icon">📅</div><div>No completed weeks yet.</div><div style="margin-top:4px;font-size:0.75rem">Complete your first week to see history here.</div></div>';
+    return;
+  }
+  container.innerHTML = state.history.map((wk, i) => {
+    const done = wk.goals.filter(g => g.done).length;
+    return `<div class="hist-card">
+      <div class="hist-head" onclick="document.getElementById('hb${i}').classList.toggle('open')">
+        <div class="hist-title">Week ${wk.week}</div>
+        <div class="hist-meta">${done}/${wk.goals.length} done · ${wk.date} ▾</div>
+      </div>
+      <div class="hist-body" id="hb${i}">
+        ${wk.goals.map(g => `<div class="hist-goal"><span class="${g.done ? 'hist-dot-done' : 'hist-dot-miss'}">${g.done ? '✓' : '✕'}</span><span style="${g.done ? '' : 'color:var(--muted)'}">${g.workoutType ? '🏋️ ' : ''}${g.text}</span></div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+renderGoals();
+renderWorkoutDoneBars();
+renderHistory();
+</script>
+</body>
+</html>

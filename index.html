@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="JFit">
+<meta name="theme-color" content="#0d0d12">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>JFit</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d0d12;
+  --surface: #16161f;
+  --surface2: #1e1e2a;
+  --border: #2a2a3a;
+  --accent: #4f8aff;
+  --green: #3dd68c;
+  --red: #ff5f5f;
+  --text: #e4e4f0;
+  --muted: #666680;
+}
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+}
+
+/* ── PIN SCREEN ── */
+#pin-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: 32px 24px;
+  gap: 0;
+}
+.lock-icon {
+  font-size: 2.6rem;
+  margin-bottom: 20px;
+}
+.pin-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem;
+  letter-spacing: 3px;
+  color: #fff;
+  margin-bottom: 6px;
+}
+.pin-sub {
+  font-size: 0.72rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 36px;
+}
+.pin-dots {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 32px;
+}
+.pin-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  transition: all 0.15s;
+}
+.pin-dot.filled {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.pin-dot.error {
+  background: var(--red);
+  border-color: var(--red);
+}
+.pin-error {
+  font-size: 0.78rem;
+  color: var(--red);
+  margin-top: -20px;
+  margin-bottom: 20px;
+  min-height: 1.2em;
+  text-align: center;
+}
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 72px);
+  gap: 12px;
+}
+.key {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.1s, transform 0.1s;
+  user-select: none;
+}
+.key:active { background: var(--surface2); transform: scale(0.93); }
+.key.zero { grid-column: 2; }
+.key.del { grid-column: 3; font-size: 1.1rem; }
+.key.empty { visibility: hidden; }
+
+/* ── HOME SCREEN ── */
+#home-screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: 40px 24px;
+}
+.home-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.8rem;
+  letter-spacing: 4px;
+  color: #fff;
+  text-align: center;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.home-sub {
+  font-size: 0.72rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 48px;
+}
+.week-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 360px;
+}
+.week-card {
+  display: block;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px 22px;
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color 0.15s, background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+.week-card:active { background: var(--surface2); border-color: var(--accent); }
+.wc-pill {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+.wc-pill.w2 { background: #f5c542; color: #0d0d12; }
+.wc-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.7rem;
+  letter-spacing: 2px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.wc-desc {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.wc-arrow {
+  float: right;
+  font-size: 1.2rem;
+  color: var(--muted);
+  margin-top: -32px;
+}
+.lock-btn {
+  margin-top: 40px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  padding: 9px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.lock-btn:active { background: var(--surface); }
+</style>
+</head>
+<body>
+
+<!-- PIN SCREEN -->
+<div id="pin-screen">
+  <div class="lock-icon">🔒</div>
+  <div class="pin-title">JFit</div>
+  <div class="pin-sub">Enter PIN to unlock</div>
+  <div class="pin-dots">
+    <div class="pin-dot" id="d0"></div>
+    <div class="pin-dot" id="d1"></div>
+    <div class="pin-dot" id="d2"></div>
+    <div class="pin-dot" id="d3"></div>
+  </div>
+  <div class="pin-error" id="pinError"></div>
+  <div class="keypad">
+    <button class="key" onclick="pressKey('1')">1</button>
+    <button class="key" onclick="pressKey('2')">2</button>
+    <button class="key" onclick="pressKey('3')">3</button>
+    <button class="key" onclick="pressKey('4')">4</button>
+    <button class="key" onclick="pressKey('5')">5</button>
+    <button class="key" onclick="pressKey('6')">6</button>
+    <button class="key" onclick="pressKey('7')">7</button>
+    <button class="key" onclick="pressKey('8')">8</button>
+    <button class="key" onclick="pressKey('9')">9</button>
+    <button class="key empty"></button>
+    <button class="key zero" onclick="pressKey('0')">0</button>
+    <button class="key del" onclick="delKey()">⌫</button>
+  </div>
+</div>
+
+<!-- HOME SCREEN -->
+<div id="home-screen">
+  <div class="home-logo">JFit</div>
+  <div class="home-sub">Coaching Dashboard</div>
+  <div class="week-cards">
+    <a class="week-card" href="week1.html">
+      <div class="wc-pill">Week 1</div>
+      <div class="wc-title">Full Body A + Cardio</div>
+      <div class="wc-desc">Goals, check-in, workouts &amp; 3-day nutrition plan</div>
+      <div class="wc-arrow">›</div>
+    </a>
+    <a class="week-card" href="week2.html">
+      <div class="wc-pill w2">Week 2</div>
+      <div class="wc-title">Volume Adjusted</div>
+      <div class="wc-desc">Coach notes, reduced quad volume, same food plan</div>
+      <div class="wc-arrow">›</div>
+    </a>
+  </div>
+  <button class="lock-btn" onclick="lockApp()">🔒 Lock</button>
+</div>
+
+<script>
+// ── CONFIG ──
+// Change this to your desired 4-digit PIN
+const CORRECT_PIN = '1234';
+const SESSION_KEY = 'coachingUnlocked';
+
+let entered = '';
+
+function isUnlocked() {
+  return sessionStorage.getItem(SESSION_KEY) === 'yes';
+}
+
+function unlock() {
+  sessionStorage.setItem(SESSION_KEY, 'yes');
+  document.getElementById('pin-screen').style.display = 'none';
+  document.getElementById('home-screen').style.display = 'flex';
+}
+
+function lockApp() {
+  sessionStorage.removeItem(SESSION_KEY);
+  entered = '';
+  updateDots();
+  document.getElementById('home-screen').style.display = 'none';
+  document.getElementById('pin-screen').style.display = 'flex';
+  document.getElementById('pinError').textContent = '';
+}
+
+function pressKey(digit) {
+  if (entered.length >= 4) return;
+  entered += digit;
+  updateDots();
+  if (entered.length === 4) {
+    setTimeout(checkPin, 80);
+  }
+}
+
+function delKey() {
+  entered = entered.slice(0, -1);
+  updateDots();
+  document.getElementById('pinError').textContent = '';
+}
+
+function updateDots() {
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById('d' + i);
+    dot.classList.toggle('filled', i < entered.length);
+    dot.classList.remove('error');
+  }
+}
+
+function checkPin() {
+  if (entered === CORRECT_PIN) {
+    unlock();
+  } else {
+    for (let i = 0; i < 4; i++) document.getElementById('d' + i).classList.add('error');
+    document.getElementById('pinError').textContent = 'Incorrect PIN — try again';
+    setTimeout(() => {
+      entered = '';
+      updateDots();
+    }, 900);
+  }
+}
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+// On load: skip PIN if already unlocked this session
+if (isUnlocked()) {
+  unlock();
+}
+</script>
+</body>
+</html>
